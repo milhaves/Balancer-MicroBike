@@ -1,0 +1,94 @@
+#VRML_SIM R2022a utf8
+WorldInfo {
+  info [
+    "Bicycle Simulation"
+  ]
+  title "Bicycle"
+  CFM 0.0003
+  ERP 0.6
+  basicTimeStep 1
+  lineScale 1
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        8
+      ]
+      bounce 0.001
+      softCFM 0.0003
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.2764808755133631 -0.006536138337817519 0.9609971926967285 3.0918312913528885
+  position 2.198965125610214 0.2993613353682569 1.2448973809266277
+  near 0.1
+  follow "Bicycle"
+  followSmoothness 0.1
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+CircleArena {
+  radius 200
+  floorAppearance Parquetry {
+    type "light strip"
+  }
+  floorTileSize 2 2
+  wallThickness 0.1
+  wallHeight 1
+  wallAppearance OldPlywood {
+  }
+}
+DEF sueprvisor Robot {
+  translation 0 0 0.02
+  controller "Bicycle_supervisor"
+  supervisor TRUE
+}
+DEF MOTORCYCLE Bicycle {
+  bicycle_shape FALSE
+  CenterMass 0.2
+  CenterHeight 0.04
+  a 0.07
+  b 0.157
+  c 0.008
+  lambda 1.05
+  FrontWheelR 0.03
+  RearWheelR 0.027
+  WheelmassF 0.01
+  WheelmassR 0.01
+  FrontforkM 0.01
+  tireRadius 0.003
+  Xff 0.125
+  Zff 0.08
+  Addon [
+    Shape {
+      appearance RoughPolymer {
+        baseColor 0.1 0.1 0.1
+      }
+      geometry Mesh {
+        url [
+          "meshes/microbike_body.obj"
+        ]
+      }
+    }
+  ]
+  Addon_Front [
+    Transform {
+      translation -0.125 0 -0.08
+      children [
+        Shape {
+          appearance RoughPolymer {
+            baseColor 0.1 0.1 0.1
+          }
+          geometry Mesh {
+            url [
+              "meshes/microbike_fork.obj"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+  controller "PID_Control_fig8"
+}
