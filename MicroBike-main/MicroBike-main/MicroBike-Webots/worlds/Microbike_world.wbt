@@ -19,8 +19,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.07891188360519322 0.35466386881210893 -0.9316579065220815 0.6963235274706928
-  position -0.6852502098425604 0.40540131275135505 0.27034836961046016
+  orientation -0.14595489801427353 0.35840777481277714 -0.9220851558827942 0.15403896860945115
+  position -0.6707203475619123 0.01675156371584286 0.10158297278349439
   near 0.1
   follow "Bicycle"
   followSmoothness 0.1
@@ -47,6 +47,7 @@ DEF sueprvisor Robot {
 }
 DEF MOTORCYCLE Bicycle {
   bicycle_shape FALSE
+  Rotation 1 0 0 0.01
   CenterMass 0.2
   CenterHeight 0.04
   a 0.07
@@ -64,7 +65,7 @@ DEF MOTORCYCLE Bicycle {
   Addon [
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 0.5
+        position -0.01
         anchor 0.055 0 0.1
       }
       device [
@@ -73,12 +74,14 @@ DEF MOTORCYCLE Bicycle {
         }
         RotationalMotor {
           name "balance_servo"
-          controlPID 0.06612500000000002 0 0.005750000000000002
+          controlPID 0.03306250000000001 0 0.002875000000000001
+          minPosition -1.5708
+          maxPosition 1.5708
         }
       ]
       endPoint Solid {
-        translation 0.055 -0.03224026735558633 0.13821734110113235
-        rotation 1 0 0 0.7007685902024263
+        translation 0.055 0.0004999916667083332 0.14999750002083326
+        rotation -1 0 0 0.01000000000000101
         children [
           Shape {
             appearance PBRAppearance {

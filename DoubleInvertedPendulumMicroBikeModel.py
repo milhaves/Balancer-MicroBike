@@ -8,7 +8,7 @@ g = 9.81
 def getModelMDK():
   g = 9.81
   m1 = 0.2
-  m2 = 15
+  m2 = 0.025
   l1 = 0.1
   lc1 = 0.04
   l2 = 0.05
@@ -26,6 +26,7 @@ def getModelMDK():
 
   # J = ((1/3)*m1*lc1*lc1)+((1/3)*m2*((l1+lc2)**2))
   J = I1+I2
+  Jload = m2*l2*l2
   # bvirtual = (-1/2)*J*(s1+s2) #virtual damper
   # Kvirtual = (-3*bvirtual**2-8*bvirtual*J*s1-4*J**2*s1**2)/(4*J) #virtual spring
   # bvirtual = -1*J*(s1+s2) #virtual damper
@@ -64,7 +65,9 @@ def getModelMDK():
   D = array([[D11,D12],[D21,D22]])
   K = array([[K11,K12],[K21,K22]])
 
-  return M,D,K,eye(2)
+  wn = 23
+
+  return M,D,K,[[1,0],[0,wn*wn*Jload]]
 
 def getModelSS():
     M,D,K,F = getModelMDK()
@@ -147,7 +150,7 @@ def getRollLQRPendulums():
     # Q[4,4] = Q[4,4]*10000
     # Q[4,4] = 0
 
-    R = 1
+    R = 1000
 
     Klqr,Slqr,Elqr = control.lqr(sys,Q,R)
     print("######### LQR GAINS for ROLL control #############")
@@ -163,11 +166,11 @@ def designClosedLoopPendulums():
 
 def main():
     #velocity = 1 #rad/s
-    data = loadtxt('Venom_model_data.txt', delimiter = ",")
-    timeData = data[:,0]
-    torqueData = data[:,2]
-    rollData = data[:,3]
-    leanData = data[:,4]
+    # data = loadtxt('Venom_model_data.txt', delimiter = ",")
+    # timeData = data[:,0]
+    # torqueData = data[:,2]
+    # rollData = data[:,3]
+    # leanData = data[:,4]
 
     sys,Ass,Bss,Css,Dss = getModelSS()
     syscl,Klqr = designClosedLoopPendulums()
@@ -179,7 +182,7 @@ def main():
 
     goalRoll = 0 #rad
 
-    tsim = linspace(0,5,1000)
+    tsim = linspace(0,2,1000)
 
     xdesired = zeros((len(tsim),1))
 
@@ -195,21 +198,22 @@ def main():
     fig = figure()
     subplot(3,1,1)
     title("Closed Loop Initial Condition Response: $\\theta_1$=0.01, $\\theta_2$=-0.01")
-    plot(tsim,goalRoll*ones((len(tsim),1)),'k--',tsim,ycl[:,0],'k',timeData,rollData,'k:')
-    # plot(tsim,goalRoll*ones((len(tsim),1)),'k--',tsim,ycl[:,0],'k')
+    # plot(tsim,goalRoll*ones((len(tsim),1)),'k--',tsim,ycl[:,0],'k',timeData,rollData,'k:')
+    plot(tsim,goalRoll*ones((len(tsim),1)),'k--',tsim,ycl[:,0],'k')
     xlabel('Time (s)')
     ylabel('$\\theta_1$ (rad)')
-    legend(['Desired Roll Angle','Linear Model Results','Webots Simulation Results'])
+    # legend(['Desired Roll Angle','Linear Model Results','Webots Simulation Results'])
     subplot(3,1,2)
-    plot(tsim,ycl[:,1],'k',timeData,leanData,'k:')
-    # plot(tsim,ycl[:,1],'k')
+    # plot(tsim,ycl[:,1],'k',timeData,leanData,'k:')
+    plot(tsim,ycl[:,1],'k')
     ylabel('$\\theta_2$ (rad)')
     subplot(3,1,3)
-    plot(tsim,ycl[:,4],'k',timeData,torqueData,'k:')
-    # plot(tsim,ycl[:,4],'k')
+    # plot(tsim,ycl[:,4],'k',timeData,torqueData,'k:')
+    plot(tsim,ycl[:,4],'k')
     # ylim(-100,100)
     xlabel('Time (s)')
-    ylabel("$\\tau$ (Nm)")
+    # ylabel("$\\tau$ (Nm)")
+    ylabel('Goal $\\theta_2$')
     # fig, axs = subplots(3,1)
     # fig.subplots_adjust(left=0.2, wspace=0.6)
     fig.align_ylabels()

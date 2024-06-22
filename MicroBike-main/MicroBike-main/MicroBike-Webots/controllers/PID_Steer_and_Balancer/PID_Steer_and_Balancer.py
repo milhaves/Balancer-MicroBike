@@ -12,7 +12,6 @@ stepMag = 0.15 #radians, magnitude of change in goal roll
 goalRoll_tau = 0.5 #seconds. Filter changes in goal roll angle to prevent asking for too fast of change
 goalRoll = 0
 goalRoll_filt = 0
-oldLean = 0
 
 firstLoop = True
 
@@ -143,8 +142,8 @@ while robot.step(timestep) != -1:
     if(firstLoop):
         oldRoll,oldPitch,oldYaw = imu.getRollPitchYaw()
         # oldYaw = yawCorr.update(oldYaw)
-        oldsteer = steersensor.getValue()
-        oldlean = balancesensor.getValue()
+        oldsteer = -steersensor.getValue()
+        oldLean = balancesensor.getValue()
         firstLoop=False
 
     # Read the sensors:
@@ -162,9 +161,11 @@ while robot.step(timestep) != -1:
 
     #read the actual steer angle from steering servo feedback
     steerangle = -steersensor.getValue()
-
-    leanangle = -balancesensor.getValue()
-
+    oldsteer = steerangle
+    leanangle = balancesensor.getValue()
+    print("oldLean: "+ str(oldLean))
+    leanRate = (leanangle-oldLean)/(timestep/1000.0)
+    oldLean = leanangle
 
 
     # set the motor to the correct velocity:
@@ -180,7 +181,7 @@ while robot.step(timestep) != -1:
    #
    # #change goal roll based on fsm state
    #  if fsm.STRAIGHT:
-   #      goalRoll = 0
+        # goalRoll = 0
    #      print("straight: "+str(T0.elapsed))
    #  elif fsm.TURNRIGHT:
    #      goalRoll = stepMag
@@ -190,7 +191,7 @@ while robot.step(timestep) != -1:
    #      print("turn left: "+str(T1.elapsed))
    #
    #  #filter goal roll angle to prevent crashing!
-   #  goalRoll_filt+= (timestep/1000.0)/goalRoll_tau*(goalRoll-goalRoll_filt)
+    # goalRoll_filt+= (timestep/1000.0)/goalRoll_tau*(goalRoll-goalRoll_filt)
 
 
     #print(roll)
@@ -200,33 +201,41 @@ while robot.step(timestep) != -1:
     steer.setVelocity(10)#setw MAX velocity of MG90s servo
     steer.setAvailableTorque(.215)#set MAX torque of MG90S
 
+    K = array([-27.685953956611872,-2.9468364325439653,-2.3901259423808274,-0.3806656958452815])
+
     wn = 23
     zeta = 1
-    m2 = 0.05
+    m2 = 0.025
     l2 = 0.05
     Jload = m2*l2*l2
     Kp = Jload*wn*wn
     Kd = 2*zeta*wn*Jload
     balance.setControlPID(Kp,0,Kd)
-    balance.setVelocity(10)#setw MAX velocity of MG90s servo
+    balance.setVelocity(10)#set MAX velocity of MG90s servo
     balance.setAvailableTorque(.215)#set MAX torque of MG90S
 
-    eRoll = goalRoll_filt -roll
+    # eRoll = goalRoll_filt -roll
+    eRoll = goalRoll - roll
     intE += (timestep/1000.0)*(eRoll)
 
-    eLean = goalLean-leanangle
+    # eLean = goalLean-leanangle
 
     #compute steer angle command based on control law
     #note that steering has a servo, so its ACTUAL steer angle is different than this command.
-    delta = kp*eRoll+ki*intE-kd*rollRate
+    goalLean = K[0]*eRoll - K[1]*leanangle - K[2]*rollRate - K[3]*leanRate
     # steer.setPosition(delta)
 
-    leanRate = (leanangle-oldLean)/timestep
-    deltaLean = Kp*eLean+Kd*leanRate
-    balance.setPosition(deltaLean)
+    # deltaLean = Kp*eLean+Kd*leanRate
 
-    oldsteer = steerangle
-    oldlean = leanangle
+    print("eRoll: "+ str(eRoll))
+    print("leanangle: "+ str(leanangle))
+    print("leanRate: "+ str(leanRate))
+    print("goalLean: "+ str(goalLean))
+    print("------------------------")
+
+    balance.setPosition(goalLean)
+
     if(recordData and simtime>=stepTime):
         #f.write("# time, goalRoll, roll, rollrate, goalSteer, steer, speed \r\n")
-        f.write(str(simtime- stepTime)+","+str(stepMag)+","+str(roll)+","+str(rollRate)+","+str(delta)+","+str(steerangle)+","+str(U)+"\r\n")
+        # f.write(str(simtime- stepTime)+","+str(stepMag)+","+str(roll)+","+str(rollRate)+","+str(delta)+","+str(steerangle)+","+str(U)+"\r\n")
+        f.write(str(simtime- stepTime)+","+str(stepMag)+","+str(roll)+","+str(rollRate)+","+str(goalLean)+","+str(steerangle)+","+str(U)+"\r\n")
