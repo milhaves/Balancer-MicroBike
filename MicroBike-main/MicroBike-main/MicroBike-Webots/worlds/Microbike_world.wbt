@@ -19,8 +19,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.2764808755133631 -0.006536138337817519 0.9609971926967285 3.0918312913528885
-  position 2.198965125610214 0.2993613353682569 1.2448973809266277
+  orientation 0.07891188360519322 0.35466386881210893 -0.9316579065220815 0.6963235274706928
+  position -0.6852502098425604 0.40540131275135505 0.27034836961046016
   near 0.1
   follow "Bicycle"
   followSmoothness 0.1
@@ -62,6 +62,42 @@ DEF MOTORCYCLE Bicycle {
   Xff 0.125
   Zff 0.08
   Addon [
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 0.5
+        anchor 0.055 0 0.1
+      }
+      device [
+        PositionSensor {
+          name "pendulum_position"
+        }
+        RotationalMotor {
+          name "balance_servo"
+          controlPID 0.06612500000000002 0 0.005750000000000002
+        }
+      ]
+      endPoint Solid {
+        translation 0.055 -0.03224026735558633 0.13821734110113235
+        rotation 1 0 0 0.7007685902024263
+        children [
+          Shape {
+            appearance PBRAppearance {
+            }
+            geometry Sphere {
+              radius 0.01
+            }
+          }
+        ]
+        boundingObject Shape {
+          geometry Sphere {
+            radius 0.01
+          }
+        }
+        physics Physics {
+          mass 0.025
+        }
+      }
+    }
     Shape {
       appearance RoughPolymer {
         baseColor 0.1 0.1 0.1
@@ -76,6 +112,7 @@ DEF MOTORCYCLE Bicycle {
   Addon_Front [
     Transform {
       translation -0.125 0 -0.08
+      scale 0.0254 0.0254 0.0254
       children [
         Shape {
           appearance RoughPolymer {
@@ -90,5 +127,5 @@ DEF MOTORCYCLE Bicycle {
       ]
     }
   ]
-  controller "PID_Control_fig8"
+  controller "PID_Steer_and_Balancer"
 }
