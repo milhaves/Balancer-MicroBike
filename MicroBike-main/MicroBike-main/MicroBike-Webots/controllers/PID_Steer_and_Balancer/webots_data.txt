@@ -1,1 +1,0 @@
-# time, goalRoll, roll, rollrate, goalSteer, steer, speed 

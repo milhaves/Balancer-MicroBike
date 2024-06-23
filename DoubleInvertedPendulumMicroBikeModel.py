@@ -6,6 +6,10 @@ import control
 g = 9.81
 
 def getModelMDK():
+
+  wn = 100.0
+  zeta = 1.0
+
   g = 9.81
   m1 = 0.2
   m2 = 0.025
@@ -17,6 +21,8 @@ def getModelMDK():
   I2 = 0
   # I1 = (1/12)*m1*lc1*lc1
   # I2 = (1/12)*m2*(l1+lc2)**2
+  Kp = m2*lc2*lc2*wn*wn
+  Kd = 2*zeta*wn*m2*lc2*lc2
 
   #smallest eigenvalues at 1.75 m/s
   s1 = -0.313826783
@@ -49,25 +55,25 @@ def getModelMDK():
   M12 = I2+(m2*l1*lc2)+(m2*lc2*lc2)
   M21 = I2+(m2*l1*lc2)+(m2*lc2*lc2)
   # M22 = I2+(m2*lc2*lc2)
-  M22 = I2+(m2*l1*lc2) # fall semester version
+  M22 = I2+(m2*lc2*lc2) # fall semester version
   # D11 = bvirtual #virtual damper about theta_1
   D11 = 0
   D12 = 0
   D21 = 0
-  D22 = 0
+  D22 = Kd
   # K11 = -g*m1*lc1-g*m2*l1-g*m2*lc2+Kvirtual #virtual spring about theta_1
   K11 = -g*m1*lc1-g*m2*l1-g*m2*lc2
   K12 = -g*m2*lc2
   K21 = -g*m2*lc2
-  K22 = -g*m2*lc2
+  K22 = -g*m2*lc2 + Kp
 
   M = array([[M11,M12],[M21,M22]])
   D = array([[D11,D12],[D21,D22]])
   K = array([[K11,K12],[K21,K22]])
 
-  wn = 23
 
-  return M,D,K,[[1,0],[0,wn*wn*Jload]]
+
+  return M,D,K,[[1,0],[0,Kp]]
 
 def getModelSS():
     M,D,K,F = getModelMDK()

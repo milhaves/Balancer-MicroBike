@@ -197,22 +197,23 @@ while robot.step(timestep) != -1:
     #print(roll)
     #set the PID gains on the steer servo
     #TODO: compute these for the REAL servo given step response of steer by itself.
-    steer.setControlPID(100,10,0)
+    steer.setControlPID(100,0,10)
     steer.setVelocity(10)#setw MAX velocity of MG90s servo
     steer.setAvailableTorque(.215)#set MAX torque of MG90S
 
-    K = array([-27.685953956611872,-2.9468364325439653,-2.3901259423808274,-0.3806656958452815])
+    # K = array([-27.685953956611872,-2.9468364325439653,-2.3901259423808274,-0.3806656958452815])
+    K = array([-26.800069981737064,-4.816520290173591,-2.3434830451507587,-0.4790641207164736])
 
-    wn = 23
+    wn = 100
     zeta = 1
     m2 = 0.025
     l2 = 0.05
     Jload = m2*l2*l2
     Kp = Jload*wn*wn
     Kd = 2*zeta*wn*Jload
-    balance.setControlPID(Kp,0,Kd)
+    balance.setControlPID(100,0,10)
     balance.setVelocity(10)#set MAX velocity of MG90s servo
-    balance.setAvailableTorque(.215)#set MAX torque of MG90S
+    balance.setAvailableTorque(100)#set MAX torque of MG90S
 
     # eRoll = goalRoll_filt -roll
     eRoll = goalRoll - roll
