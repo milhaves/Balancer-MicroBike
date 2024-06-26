@@ -19,10 +19,11 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.02783315224865285 0.1352114087452986 -0.9904257622765146 0.870201410277698
-  position -0.1887935419006868 0.37396570562475284 0.1237468702722362
+  orientation -0.03236641633845148 0.6533923881613036 -0.7563271793253726 0.26858769858115933
+  position -0.6613495370545445 0.20036336979362204 0.20406432160885057
   near 0.1
   follow "Bicycle"
+  followType "Mounted Shot"
   followSmoothness 0.1
 }
 TexturedBackground {
@@ -65,6 +66,8 @@ DEF MOTORCYCLE Bicycle {
     HingeJoint {
       jointParameters HingeJointParameters {
         anchor 0.055 0 0.1
+        springConstant 1000
+        dampingConstant 1000
       }
       device [
         PositionSensor {
@@ -107,7 +110,8 @@ DEF MOTORCYCLE Bicycle {
           }
         }
         physics Physics {
-          mass 0.0025
+          density -1
+          mass 0.01
         }
       }
     }
@@ -140,5 +144,5 @@ DEF MOTORCYCLE Bicycle {
       ]
     }
   ]
-  controller "StepResponseTest"
+  controller "PID_Control_fig8"
 }

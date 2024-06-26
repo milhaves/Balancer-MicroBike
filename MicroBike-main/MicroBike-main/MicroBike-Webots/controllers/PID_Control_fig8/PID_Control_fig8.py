@@ -118,9 +118,9 @@ steerangle = 0
 
 
 #control gains for roll control  (PI)
-kp = 2;
-ki = 20;
-kd = 0.1;
+kp = 2.42;
+ki = 5.8;
+kd = .22;
 
 eRoll = 0;
 eRoll_old = 0;
