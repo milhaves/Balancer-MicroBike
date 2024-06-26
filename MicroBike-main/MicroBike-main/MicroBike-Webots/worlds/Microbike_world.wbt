@@ -19,8 +19,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.03236641633845148 0.6533923881613036 -0.7563271793253726 0.26858769858115933
-  position -0.23943614440832467 0.11220521921167653 0.1285750309733185
+  orientation -0.10596193538635092 0.8514639293920105 -0.5135963835479139 0.18148440727499437
+  position -0.3761710618622472 0.014873614718679793 0.1414910113547042
   near 0.1
   follow "Bicycle"
   followType "Mounted Shot"
@@ -66,7 +66,6 @@ DEF MOTORCYCLE Bicycle {
     HingeJoint {
       jointParameters HingeJointParameters {
         anchor 0.055 0 0.1
-        springConstant 1000
         dampingConstant 1000
       }
       device [
@@ -145,5 +144,5 @@ DEF MOTORCYCLE Bicycle {
       ]
     }
   ]
-  controller "StepResponseTest"
+  controller "PID_Control_fig8"
 }
