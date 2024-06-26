@@ -111,7 +111,7 @@ steersensor = robot.getDevice('steer_angle')
 steersensor.enable(timestep)
 
 
-#initialize variables needed for meeasurement and control
+#initialize variables needed for measurement and control
 simtime = 0.0
 steerangle = 0
 

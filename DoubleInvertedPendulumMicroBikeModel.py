@@ -35,12 +35,12 @@ def getModelMDK():
   Jload = m2*l2*l2
   # bvirtual = (-1/2)*J*(s1+s2) #virtual damper
   # Kvirtual = (-3*bvirtual**2-8*bvirtual*J*s1-4*J**2*s1**2)/(4*J) #virtual spring
-  # bvirtual = -1*J*(s1+s2) #virtual damper
+  bvirtual = -1*J*(s1+s2) #virtual damper
   Keffective = J*s1*s2 #virtual spring
-  # Kvirtual = Keffective + (m1*lc1+m2*l2)*g
+  Kvirtual = Keffective + (m1*lc1+m2*l2)*g
 
-  bvirtual = 0
-  Kvirtual = 0
+  # bvirtual = 0
+  # Kvirtual = 0
 
   print('######### J #########')
   print(J)
@@ -54,15 +54,14 @@ def getModelMDK():
   M11 = I1+I2+(m2*l1*l1)+(m2*lc2*lc2)+(m1*lc1*lc1)+(2*m2*l1*lc2) #unsure about the 2
   M12 = I2+(m2*l1*lc2)+(m2*lc2*lc2)
   M21 = I2+(m2*l1*lc2)+(m2*lc2*lc2)
-  # M22 = I2+(m2*lc2*lc2)
-  M22 = I2+(m2*lc2*lc2) # fall semester version
-  # D11 = bvirtual #virtual damper about theta_1
-  D11 = 0
+  M22 = I2+(m2*lc2*lc2)
+  D11 = bvirtual #virtual damper about theta_1
+  # D11 = 0
   D12 = 0
   D21 = 0
   D22 = Kd
-  # K11 = -g*m1*lc1-g*m2*l1-g*m2*lc2+Kvirtual #virtual spring about theta_1
-  K11 = -g*m1*lc1-g*m2*l1-g*m2*lc2
+  K11 = -g*m1*lc1-g*m2*l1-g*m2*lc2+Kvirtual #virtual spring about theta_1
+  # K11 = -g*m1*lc1-g*m2*l1-g*m2*lc2
   K12 = -g*m2*lc2
   K21 = -g*m2*lc2
   K22 = -g*m2*lc2 + Kp
