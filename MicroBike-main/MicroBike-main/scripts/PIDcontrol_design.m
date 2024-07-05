@@ -38,6 +38,4 @@ Ki = z1*z2*Klocus
 
 Gcl = minreal(Klocus*Cstar*Gservo*G/(1+Klocus*Cstar*Gservo*G))
 figure
-rlocus(Gcl)
-figure
 step(Gcl*1/(.25*s+1))

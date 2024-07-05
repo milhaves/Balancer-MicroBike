@@ -46,9 +46,9 @@ simtime = 0.0
 steerangle = 0
 
 #control gains for roll control  (PI)
-kp = 2;
-ki = 20;
-kd = 0.1;
+kp = 1.95;
+ki = 6;
+kd = 0.15;
 
 eRoll = 0;
 eRoll_old = 0;
@@ -86,7 +86,7 @@ while robot.step(timestep) != -1:
     #filter goal roll angle to prevent crashing!
     goalRoll_filt += (timestep/1000.0)/goalRoll_tau*(goalRoll-goalRoll_filt)
 
-    steer.setControlPID(1.95,6,0.15)
+    steer.setControlPID(100,10,0)
     steer.setVelocity(10)#set MAX velocity of MG90s servo
     steer.setAvailableTorque(.215)#set MAX torque of MG90S
 
