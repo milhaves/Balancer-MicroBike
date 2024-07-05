@@ -19,11 +19,11 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.02783315224865285 0.1352114087452986 -0.9904257622765146 0.870201410277698
-  position -0.1887935419006868 0.37396570562475284 0.1237468702722362
+  orientation -0.18968019183772356 0.6171371079920793 -0.7636512389589748 0.12086096057313025
+  position -1.4362785104898859 0.037347763327181135 0.22188415773387712
   near 0.1
   follow "Bicycle"
-  followSmoothness 0.1
+  followSmoothness 0.03
 }
 TexturedBackground {
 }
@@ -65,6 +65,7 @@ DEF MOTORCYCLE Bicycle {
     HingeJoint {
       jointParameters HingeJointParameters {
         anchor 0.055 0 0.1
+        dampingConstant 1000
       }
       device [
         PositionSensor {
@@ -72,9 +73,10 @@ DEF MOTORCYCLE Bicycle {
         }
         RotationalMotor {
           name "balance_servo"
-          controlPID 100 0 10
+          controlPID 1000 0 1000
           minPosition -1.5708
           maxPosition 1.5708
+          maxTorque 1000
         }
       ]
       endPoint Solid {
@@ -107,7 +109,8 @@ DEF MOTORCYCLE Bicycle {
           }
         }
         physics Physics {
-          mass 0.0025
+          density -1
+          mass 0.01
         }
       }
     }
@@ -140,5 +143,5 @@ DEF MOTORCYCLE Bicycle {
       ]
     }
   ]
-  controller "StepResponseTest"
+  controller "PID_Control_fig8"
 }

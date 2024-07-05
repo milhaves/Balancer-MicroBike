@@ -4,9 +4,7 @@ from numpy import *
 robot = Robot()
 
 recordData = True
-
 stepMag = 0.15
-
 goalRoll = 0
 goalRoll_tau = 0.5
 goalRoll_filt = 0
@@ -46,9 +44,19 @@ simtime = 0.0
 steerangle = 0
 
 #control gains for roll control  (PI)
+<<<<<<< HEAD
 kp = 1.95;
 ki = 6;
 kd = 0.15;
+=======
+# kp = 2;
+# ki = 20;
+# kd = 0.1;
+#control gains for roll control  (PID)
+kp = 2.42;
+ki = 5.8;
+kd = .22;
+>>>>>>> 3bce3aef38eb9209a15435d6ec8036d1e1a23bfc
 
 eRoll = 0;
 eRoll_old = 0;
@@ -86,9 +94,13 @@ while robot.step(timestep) != -1:
     #filter goal roll angle to prevent crashing!
     goalRoll_filt += (timestep/1000.0)/goalRoll_tau*(goalRoll-goalRoll_filt)
 
+<<<<<<< HEAD
     steer.setControlPID(100,10,0)
+=======
+    steer.setControlPID(1000,0,1000)
+>>>>>>> 3bce3aef38eb9209a15435d6ec8036d1e1a23bfc
     steer.setVelocity(10)#set MAX velocity of MG90s servo
-    steer.setAvailableTorque(.215)#set MAX torque of MG90S
+    steer.setAvailableTorque(1000)#set MAX torque of MG90S
 
     eRoll = goalRoll_filt - roll
     intE += (timestep/1000.0)*(eRoll)

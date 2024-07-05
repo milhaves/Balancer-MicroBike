@@ -13,10 +13,20 @@ goalRoll_tau = 0.5 #seconds. Filter changes in goal roll angle to prevent asking
 goalRoll = 0
 goalRoll_filt = 0
 
+wn_bal = 23 #simulated balancer PID guy
+z_bal = 1.0 # simulated balancer PID guy
+lean_sim = 0 #simulated lean angle
+leandot_sim = 0 #simulated lean velocity
+goal_lean = 0
+lean = 0
+oldlean = 0
+
 #set the simulation forward speed and calculate rear wheel omega
 driveVelocity= 1.5#3.95#28.95
 Rrw = 0.027 #microbike rear wheel diameter
 driveOmega = driveVelocity/Rrw
+
+Klqr_balance = array([11.482744698711205,4.111493889816979,1.9402704228496588,0.5144317826490733])
 
 if recordData:
     # start a file we can use to collect data
@@ -98,6 +108,8 @@ timestep = int(robot.getBasicTimeStep())
 # Set up sensors and motors on the bike:
 motor = robot.getDevice('drive_motor')
 steer = robot.getDevice('steering_motor')
+balance = robot.getDevice('balance_servo')
+
 motor.setPosition(float('inf'))
 
 imu = robot.getDevice('imu')
@@ -109,6 +121,8 @@ gyro.enable(timestep)
 
 steersensor = robot.getDevice('steer_angle')
 steersensor.enable(timestep)
+balancesensor = robot.getDevice('pendulum_position')
+balancesensor.enable(timestep)
 
 
 #initialize variables needed for measurement and control
@@ -118,9 +132,9 @@ steerangle = 0
 
 
 #control gains for roll control  (PI)
-kp = 2;
-ki = 20;
-kd = 0.1;
+kp = 2.42;
+ki = 5.8;
+kd = .22;
 
 eRoll = 0;
 eRoll_old = 0;
@@ -149,6 +163,9 @@ while robot.step(timestep) != -1:
     #read the actual steer angle from steering servo feedback
     steerangle = -steersensor.getValue()
     oldsteer = steerangle
+    lean = balancesensor.getValue()
+    leanrate = (lean-oldlean)/(timestep/1000.0)
+    oldlean = lean
 
 
     # set the motor to the correct velocity:
@@ -166,15 +183,25 @@ while robot.step(timestep) != -1:
         goalRoll = 0
         print("straight: "+str(T0.elapsed))
     elif fsm.TURNRIGHT:
-        goalRoll = stepMag
+        goalRoll = 0
         print("turn right: "+str(T1.elapsed))
     elif fsm.TURNLEFT:
-        goalRoll =-stepMag
+        goalRoll =stepMag
         print("turn left: "+str(T1.elapsed))
 
     #filter goal roll angle to prevent crashing!
     goalRoll_filt+= (timestep/1000.0)/goalRoll_tau*(goalRoll-goalRoll_filt)
-
+    
+    #step in balance goal lean
+    if(simtime>2):
+        goal_lean = 0.5
+    
+    goal_lean = -(Klqr_balance[0]*roll +Klqr_balance[1]*lean + Klqr_balance[2]*rollRate + Klqr_balance[3]*leanrate)
+    
+    #now compute true lean based on goal lean and servo dynamics
+    lean_sim+= timestep/1000.0*leandot_sim
+    leandot_sim+=  timestep/1000.0*(wn_bal*wn_bal*(goal_lean-lean_sim) - z_bal*wn_bal*leandot_sim)
+    
 
     #print(roll)
     #set the PID gains on the steer servo
@@ -190,6 +217,7 @@ while robot.step(timestep) != -1:
     #note that steering has a servo, so its ACTUAL steer angle is different than this command.
     delta = kp*eRoll+ki*intE-kd*rollRate
     steer.setPosition(delta)
+    balance.setPosition(lean_sim)
 
     if(recordData and simtime>=stepTime):
         #f.write("# time, goalRoll, roll, rollrate, goalSteer, steer, speed \r\n")
