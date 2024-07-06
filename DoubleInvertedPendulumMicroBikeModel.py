@@ -25,9 +25,9 @@ def getModelMDK():
   Kd = 2*zeta*wn*m2*lc2*lc2
 
   #smallest eigenvalues at 1.75 m/s
-  s1 = -0.313826783
+  s1 = -3.393
   # s1 = -5
-  s2 = -3.89160387
+  s2 = -3.393
   # s2 = -10
 
   # J = ((1/3)*m1*lc1*lc1)+((1/3)*m2*((l1+lc2)**2))

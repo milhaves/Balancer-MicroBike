@@ -20,7 +20,7 @@ WorldInfo {
 }
 Viewpoint {
   orientation -0.18968019183772356 0.6171371079920793 -0.7636512389589748 0.12086096057313025
-  position -1.4362785104898859 0.037347763327181135 0.22188415773387712
+  position -0.9200737902030023 -0.01096028245157108 0.18375255241040145
   near 0.1
   follow "Bicycle"
   followSmoothness 0.03
@@ -47,6 +47,7 @@ DEF sueprvisor Robot {
 }
 DEF MOTORCYCLE Bicycle {
   bicycle_shape FALSE
+  Rotation 1 0 0 0.01
   CenterMass 0.2
   CenterHeight 0.04
   a 0.07
@@ -64,6 +65,7 @@ DEF MOTORCYCLE Bicycle {
   Addon [
     HingeJoint {
       jointParameters HingeJointParameters {
+        position -0.01
         anchor 0.055 0 0.1
         dampingConstant 1000
       }
@@ -80,8 +82,8 @@ DEF MOTORCYCLE Bicycle {
         }
       ]
       endPoint Solid {
-        translation 0.055 0 0.15
-        rotation 1 0 0 0
+        translation 0.055 0.0004999916667083332 0.14999750002083326
+        rotation -1 0 0 0.01000000000000101
         children [
           Transform {
             translation 0 0 -0.03

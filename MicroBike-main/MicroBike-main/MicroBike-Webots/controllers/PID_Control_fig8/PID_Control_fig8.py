@@ -7,7 +7,8 @@ from numpy import *
 robot = Robot()
 
 recordData = True
-stepTime = 2 #seconds, time at which goal roll changes
+# stepTime = 2 #seconds, time at which goal roll changes
+stepTime = 0
 stepMag = 0.15 #radians, magnitude of change in goal roll
 goalRoll_tau = 0.5 #seconds. Filter changes in goal roll angle to prevent asking for too fast of change
 goalRoll = 0
@@ -19,10 +20,11 @@ lean_sim = 0 #simulated lean angle
 leandot_sim = 0 #simulated lean velocity
 goal_lean = 0
 lean = 0
-oldlean = 0
+oldlean = -0.01 ############################ Make sure to change this later!
 
 #set the simulation forward speed and calculate rear wheel omega
-driveVelocity= 1.5#3.95#28.95
+# driveVelocity= 1.5#3.95#28.95
+driveVelocity = 0
 Rrw = 0.027 #microbike rear wheel diameter
 driveOmega = driveVelocity/Rrw
 
@@ -184,20 +186,22 @@ while robot.step(timestep) != -1:
    #change goal roll based on fsm state
     if fsm.STRAIGHT:
         goalRoll = 0
-        print("straight: "+str(T0.elapsed))
+        # print("straight: "+str(T0.elapsed))
     elif fsm.TURNRIGHT:
         goalRoll = 0
-        print("turn right: "+str(T1.elapsed))
+        # print("turn right: "+str(T1.elapsed))
     elif fsm.TURNLEFT:
         goalRoll =stepMag
-        print("turn left: "+str(T1.elapsed))
+        # print("turn left: "+str(T1.elapsed))
+
+    goalRoll = 0
 
     #filter goal roll angle to prevent crashing!
     goalRoll_filt+= (timestep/1000.0)/goalRoll_tau*(goalRoll-goalRoll_filt)
 
     #step in balance goal lean
-    if(simtime>stepTime):
-        goal_lean = 0.5
+    # if(simtime>stepTime):
+    #     goal_lean = 0.5
 
     goal_lean = -(Klqr_balance[0]*roll +Klqr_balance[1]*lean + Klqr_balance[2]*rollRate + Klqr_balance[3]*leanrate)
 
@@ -219,9 +223,17 @@ while robot.step(timestep) != -1:
     #compute steer angle command based on control law
     #note that steering has a servo, so its ACTUAL steer angle is different than this command.
     delta = kp*eRoll+ki*intE-kd*rollRate
-    steer.setPosition(delta)
-    # balance.setPosition(lean_sim)
-    balance.setPosition(0)
+    # steer.setPosition(delta)
+    steer.setPosition(0)
+    balance.setPosition(lean_sim)
+    # balance.setPosition(0)
+
+    print("Goal Roll: "+str(goalRoll))
+    print("Roll: "+str(roll))
+    print("Goal Lean: "+str(goal_lean))
+    print("Lean: "+str(lean))
+    print("Lean_sim: "+str(lean_sim))
+    print("##########################")
 
     if(recordData and simtime>=stepTime):
         #f.write("# time, goalRoll, roll, rollrate, goalSteer, steer, speed \r\n")

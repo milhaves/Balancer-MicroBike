@@ -44,11 +44,9 @@ simtime = 0.0
 steerangle = 0
 
 #control gains for roll control  (PI)
-<<<<<<< HEAD
-kp = 1.95;
-ki = 6;
-kd = 0.15;
-=======
+# kp = 1.95;
+# ki = 6;
+# kd = 0.15;
 # kp = 2;
 # ki = 20;
 # kd = 0.1;
@@ -56,7 +54,6 @@ kd = 0.15;
 kp = 2.42;
 ki = 5.8;
 kd = .22;
->>>>>>> 3bce3aef38eb9209a15435d6ec8036d1e1a23bfc
 
 eRoll = 0;
 eRoll_old = 0;
