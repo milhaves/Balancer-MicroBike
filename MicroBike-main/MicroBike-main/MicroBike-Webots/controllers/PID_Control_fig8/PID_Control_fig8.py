@@ -133,8 +133,11 @@ steerangle = 0
 
 #control gains for roll control  (PI)
 kp = 2.42;
+# kp = 1.98
 ki = 5.8;
+# ki = 4.32
 kd = .22;
+# kd = 0.18
 
 eRoll = 0;
 eRoll_old = 0;
@@ -191,17 +194,17 @@ while robot.step(timestep) != -1:
 
     #filter goal roll angle to prevent crashing!
     goalRoll_filt+= (timestep/1000.0)/goalRoll_tau*(goalRoll-goalRoll_filt)
-    
+
     #step in balance goal lean
-    if(simtime>2):
+    if(simtime>stepTime):
         goal_lean = 0.5
-    
+
     goal_lean = -(Klqr_balance[0]*roll +Klqr_balance[1]*lean + Klqr_balance[2]*rollRate + Klqr_balance[3]*leanrate)
-    
+
     #now compute true lean based on goal lean and servo dynamics
     lean_sim+= timestep/1000.0*leandot_sim
     leandot_sim+=  timestep/1000.0*(wn_bal*wn_bal*(goal_lean-lean_sim) - z_bal*wn_bal*leandot_sim)
-    
+
 
     #print(roll)
     #set the PID gains on the steer servo
@@ -217,7 +220,8 @@ while robot.step(timestep) != -1:
     #note that steering has a servo, so its ACTUAL steer angle is different than this command.
     delta = kp*eRoll+ki*intE-kd*rollRate
     steer.setPosition(delta)
-    balance.setPosition(lean_sim)
+    # balance.setPosition(lean_sim)
+    balance.setPosition(0)
 
     if(recordData and simtime>=stepTime):
         #f.write("# time, goalRoll, roll, rollrate, goalSteer, steer, speed \r\n")

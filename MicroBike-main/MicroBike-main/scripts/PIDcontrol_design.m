@@ -40,14 +40,9 @@ Ki = z1*z2*Klocus
 Gcl = minreal(Klocus*Cstar*Gservo*G/(1+Klocus*Cstar*Gservo*G))
 
 [num,den] = tfdata(Gcl,'v');
+real(roots(den))
 plot(real(roots(den)),imag(roots(den)),'k*')
 legend('no actuator','with actuator dynamics','cl eigs')
 
-
 figure
-<<<<<<< HEAD
-=======
-% rlocus(Gcl)
-figure
->>>>>>> 3bce3aef38eb9209a15435d6ec8036d1e1a23bfc
 step(Gcl*1/(.25*s+1))

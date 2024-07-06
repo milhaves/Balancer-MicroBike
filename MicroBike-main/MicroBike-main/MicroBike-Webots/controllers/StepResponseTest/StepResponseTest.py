@@ -94,11 +94,11 @@ while robot.step(timestep) != -1:
     #filter goal roll angle to prevent crashing!
     goalRoll_filt += (timestep/1000.0)/goalRoll_tau*(goalRoll-goalRoll_filt)
 
-<<<<<<< HEAD
+# <<<<<<< HEAD
     steer.setControlPID(100,10,0)
-=======
-    steer.setControlPID(1000,0,1000)
->>>>>>> 3bce3aef38eb9209a15435d6ec8036d1e1a23bfc
+# =======
+    # steer.setControlPID(1000,0,1000)
+# >>>>>>> 3bce3aef38eb9209a15435d6ec8036d1e1a23bfc
     steer.setVelocity(10)#set MAX velocity of MG90s servo
     steer.setAvailableTorque(1000)#set MAX torque of MG90S
 
