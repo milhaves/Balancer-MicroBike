@@ -155,7 +155,7 @@ def getRollLQRPendulums():
     # Q[4,4] = Q[4,4]*10000
     # Q[4,4] = 0
 
-    R = 1
+    R = 1000
 
     Klqr,Slqr,Elqr = control.lqr(sys,Q,R)
     print("######### LQR GAINS for ROLL control #############")
@@ -187,7 +187,7 @@ def main():
 
     goalRoll = 0 #rad
 
-    tsim = linspace(0,4,1000)
+    tsim = linspace(0,2,1000)
 
     xdesired = zeros((len(tsim),1))
 
