@@ -2,6 +2,15 @@ clear all;
 close all
 clc;
 
+% static = readmatrix('WithoutBalancer.txt');
+% timeStatic = static(:,1);
+% timeStatic = timeStatic-2;
+% rollStatic = static(:,3);
+% rollStatic = rollStatic/0.15;
+
+webots = readmatrix(webots_data.)
+
+
 g = 9.81;
 c = .01;
 a = .05;
@@ -40,8 +49,11 @@ Ki = z1*z2*Klocus
 Gcl = minreal(Klocus*Cstar*Gservo*G/(1+Klocus*Cstar*Gservo*G))
 
 [num,den] = tfdata(Gcl,'v');
+real(roots(den))
 plot(real(roots(den)),imag(roots(den)),'k*')
 legend('no actuator','with actuator dynamics','cl eigs')
 
 figure
 step(Gcl*1/(.25*s+1))
+hold on
+plot(timeStatic,rollStatic,'k.')

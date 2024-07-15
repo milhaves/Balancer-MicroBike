@@ -19,8 +19,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.032366416338499335 0.6533923881614059 -0.7563271793252824 0.2685876985811826
-  position -0.37302414904649583 0.08988158531327488 0.15500446175363558
+  orientation -0.01041377911151358 0.014740283267175507 -0.9998371253628363 1.6515834801161913
+  position 0.15055859181813702 0.8105245621736075 0.07348813504673522
   near 0.1
   follow "Bicycle"
   followType "Mounted Shot"
@@ -43,7 +43,7 @@ CircleArena {
 }
 DEF sueprvisor Robot {
   translation 0 0 0.02
-  controller "Bicycle_supervisor"
+  controller ""
   supervisor TRUE
 }
 DEF MOTORCYCLE Bicycle {
@@ -63,56 +63,24 @@ DEF MOTORCYCLE Bicycle {
   Xff 0.125
   Zff 0.08
   Addon [
-    HingeJoint {
-      jointParameters HingeJointParameters {
-        anchor 0.055 0 0.1
-      }
-      device [
-        PositionSensor {
-          name "pendulum_position"
-        }
-        RotationalMotor {
-          name "balance_servo"
-          controlPID 10 0 1
-          minPosition -1.5708
-          maxPosition 1.5708
-          maxTorque 0.215
+    Solid {
+      translation 0.075 0 0.0125
+      children [
+        DEF stand_shape Shape {
+          geometry Box {
+            size 0.025 0.5 0.025
+          }
         }
       ]
-      endPoint Solid {
-        translation 0.055 0 0.15
-        rotation 1 0 0 0
-        children [
-          Transform {
-            translation 0 0 -0.03
-            children [
-              Shape {
-                appearance PBRAppearance {
-                }
-                geometry Box {
-                  size 0.0015 0.0015 0.05
-                }
-              }
-            ]
-          }
-          Shape {
-            appearance PBRAppearance {
-            }
-            geometry Sphere {
-              radius 0.01
-            }
-          }
-        ]
-        boundingObject Shape {
-          geometry Sphere {
-            radius 0.01
-          }
-        }
-        physics Physics {
-          density -1
-          mass 0.05
+      name "solid(2)"
+      boundingObject USE stand_shape
+      physics Physics {
+        mass 10
+        damping Damping {
         }
       }
+      translationStep 0.0001
+      rotationStep 0.001
     }
     Shape {
       appearance RoughPolymer {
@@ -143,5 +111,5 @@ DEF MOTORCYCLE Bicycle {
       ]
     }
   ]
-  controller "PID_Control_fig8"
+  controller "steer_actuator_validation_controller"
 }

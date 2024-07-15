@@ -2,6 +2,18 @@ clear all;
 close all
 clc;
 
+static = readmatrix('WithoutBalancer.txt');
+timeStatic = static(:,1);
+timeStatic = timeStatic-2;
+rollStatic = static(:,3);
+rollStatic = rollStatic/0.15;
+
+webots = readmatrix('webots_data.txt');
+timeWebots = webots(:,1);
+timeWebots = timeWebots - 2;
+rollWebots = webots(:,3);
+rollWebots = rollWebots/-0.1+1;
+
 g = 9.81;
 c = .01;
 a = .05;
@@ -32,7 +44,7 @@ figure
 rlocus(G*Cstar,G*Cstar*Gservo)
 hold on
 
-Klocus = 0.22
+Klocus = 0.2915
 Kd = Klocus
 Kp = (z1+z2)*Klocus
 Ki = z1*z2*Klocus
@@ -46,3 +58,8 @@ legend('no actuator','with actuator dynamics','cl eigs')
 
 figure
 step(Gcl*1/(.25*s+1))
+hold on
+plot(timeWebots,rollWebots,'k.',timeStatic,rollStatic,'r.')
+% plot(timeWebots,rollWebots,'k.')
+legend('Modeled Step','Webots Stationary','Webots Driving')
+% legend('Modeled Step','Webots Stationary')

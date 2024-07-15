@@ -5,19 +5,21 @@ import control
 import control.matlab as cnt
 
 def main():
-    data = loadtxt('webots_data.txt', delimiter = ",")
+    data = loadtxt('liftedSteeringStep.txt', delimiter = ",")
     timeData = data[:,0]
-    goalRollData = data[:,1]
+    timeData = timeData - 2
+    # goalRollData = data[:,1]
     rollData = data[:,2]
-    rollRateData = data[:,3]
-    steerData = data[:,5]
-    speedData = data[:,6]
+    rollData = rollData/-1+0.1
+    # rollRateData = data[:,3]
+    # steerData = data[:,5]
+    # speedData = data[:,6]
 
     tsim = linspace(0,3,1000)
     xdesired = zeros((len(tsim),1))
-    xdesired[:,0] = 0.15 #same as stepMag in PID_Control_fig8.py
+    xdesired[:,0] = 0.1
 
-    goalRoll = 0.15
+    goalRoll = 0.1
 
     # # Kstep = 0.2
     # # wn = 15
@@ -40,8 +42,8 @@ def main():
     I1 = (1/3)*m1*lc1*lc1
     I2 = (1/3)*m2*(l1+lc2)**2
 
-    s1 = -3.393 #taken fron PIDcontrol_design.m
-    s2 = -3.393
+    s1 = -3.2228 #taken fron PIDcontrol_design.m
+    s2 = -3.2228
 
     J = I1+I2
 
@@ -64,15 +66,16 @@ def main():
     xVirt,tsimVirt,something = cnt.lsim(P,xdesired,tsim)
 
     figure()
-    subplot(2,1,1)
+    # subplot(2,1,1)
     title("Steer Control w/ Locked Balancer CLSR: Desired Roll = "+"{:.2f}".format(goalRoll)+" radians")
     plot(tsim,goalRoll*ones((len(tsim),1)),'k--',timeData,rollData,'k',tsimVirt,xVirt,'r')
     xlabel('Time (s)')
     ylabel('Roll Angle (rad)')
     legend(['Desired Roll Angle', 'Webots Step Response', 'Modeled Step Response'])
-    subplot(2,1,2)
-    plot(timeData,steerData,'k')
-    ylabel('Steer Angle (rad)')
+    xlim([0,3])
+    # subplot(2,1,2)
+    # plot(timeData,steerData,'k')
+    # ylabel('Steer Angle (rad)')
     show()
 
 if __name__ == '__main__':

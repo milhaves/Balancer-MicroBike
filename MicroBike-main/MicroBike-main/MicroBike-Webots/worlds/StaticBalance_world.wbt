@@ -19,12 +19,11 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.032366416338499335 0.6533923881614059 -0.7563271793252824 0.2685876985811826
-  position -0.37302414904649583 0.08988158531327488 0.15500446175363558
+  orientation -0.18968019183772356 0.6171371079920793 -0.7636512389589748 0.12086096057313025
+  position -0.9200737902030023 -0.01096028245157108 0.18375255241040145
   near 0.1
   follow "Bicycle"
-  followType "Mounted Shot"
-  followSmoothness 0.1
+  followSmoothness 0.03
 }
 TexturedBackground {
 }
@@ -73,14 +72,14 @@ DEF MOTORCYCLE Bicycle {
         }
         RotationalMotor {
           name "balance_servo"
-          controlPID 10 0 1
+          controlPID 100 10 0
           minPosition -1.5708
           maxPosition 1.5708
           maxTorque 0.215
         }
       ]
       endPoint Solid {
-        translation 0.055 0 0.15
+        translation 0.055 -0.0004999916667083332 0.14999750002083326
         rotation 1 0 0 0
         children [
           Transform {
@@ -103,6 +102,7 @@ DEF MOTORCYCLE Bicycle {
             }
           }
         ]
+        name "balancer mass"
         boundingObject Shape {
           geometry Sphere {
             radius 0.01
@@ -143,5 +143,5 @@ DEF MOTORCYCLE Bicycle {
       ]
     }
   ]
-  controller "PID_Control_fig8"
+  controller "StaticBalance"
 }

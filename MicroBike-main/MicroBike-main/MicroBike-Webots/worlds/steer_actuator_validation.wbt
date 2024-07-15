@@ -1,0 +1,84 @@
+#VRML_SIM R2022a utf8
+WorldInfo {
+  info [
+    "Autonomous Path Following World"
+  ]
+  title "Autonomous Motorcycle"
+  CFM 0.0003
+  ERP 0.7
+  basicTimeStep 5
+  lineScale 1
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        8
+      ]
+      bounce 0
+      bounceVelocity 0.1
+      softCFM 0.0003
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.0249415252318193 0.017402776271934154 -0.9995374248606902 4.301974223926031
+  position 0.3659116839627223 -0.8269109872799909 0.004303193620937312
+  follow "Bicycle"
+  followSmoothness 0.1
+}
+TexturedBackground {
+  texture "dusk"
+}
+TexturedBackgroundLight {
+}
+Floor {
+  size 300 300
+  tileSize 10 10
+  appearance Grass {
+  }
+}
+DEF supervisor Robot {
+  translation 1 0 1.02
+  controller ""
+  supervisor TRUE
+}
+DEF MOTORCYCLE Bicycle {
+  bicycle_shape FALSE
+  motorcycle_shape TRUE
+  CenterMass 0.2
+  CenterHeight 0.04
+  a 0.07
+  b 0.157
+  c 0.008
+  lambda 1.05
+  FrontWheelR 0.03
+  RearWheelR 0.027
+  WheelmassF 0.01
+  WheelmassR 0.01
+  FrontforkM 0.01
+  tireRadius 0.003
+  Xff 0.125
+  Zff 0.08
+  Addon [
+    Solid {
+      translation 0.075 0 0.014
+      children [
+        DEF stand_shape Shape {
+          geometry Box {
+            size 0.03 1 0.0275
+          }
+        }
+      ]
+      name "solid(2)"
+      boundingObject USE stand_shape
+      physics Physics {
+        density -1
+        mass 1000
+        damping Damping {
+        }
+      }
+      translationStep 0.0001
+      rotationStep 0.01
+    }
+  ]
+  controller "steer_actuator_validation_controller"
+}

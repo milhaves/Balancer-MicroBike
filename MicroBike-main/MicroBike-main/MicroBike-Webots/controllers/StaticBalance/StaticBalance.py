@@ -8,6 +8,7 @@ robot = Robot()
 
 recordData = True
 stepTime = 2 #seconds, time at which goal roll changes
+# stepTime = 0
 stepMag = 0.15 #radians, magnitude of change in goal roll
 goalRoll_tau = 0.5 #seconds. Filter changes in goal roll angle to prevent asking for too fast of change
 goalRoll = 0
@@ -21,17 +22,26 @@ goal_lean = 0
 lean = 0
 oldlean = 0
 
+firstLoop = True
+
+lastControlTime = 0
+dTcontrol = 0.0005
+
 #set the simulation forward speed and calculate rear wheel omega
-driveVelocity= 1.5#3.95#28.95
+driveVelocity= 1.75#3.95#28.95
+# driveVelocity = 0
 Rrw = 0.027 #microbike rear wheel diameter
 driveOmega = driveVelocity/Rrw
 
-Klqr_balance = array([11.482744698711205,4.111493889816979,1.9402704228496588,0.5144317826490733])
+Klqr_balance = array([11.482744698711205,4.111493889816979,1.9402704228496588,0.5144317826490733]) #R=1000
+# Klqr_balance = array([13.65258171555482,5.1895422344779165,2.314584057673394,0.6537620854556571]) #R=100
+# Klqr_balance = array([24.360423779602062,10.477680282605482,4.162128552835325,1.3363652894025462]) #R=10
+# Klqr_balance = array([63.35328842893674,29.478794880874396,10.887856437132848,3.780641295110953]) #R=1
 
 if recordData:
     # start a file we can use to collect data
     f = open('webots_data.txt','w')
-    f.write("# time, goalRoll, roll, rollrate, goalSteer, steer, speed \r\n")
+    f.write("# time, goalRoll, roll, rollrate, goalSteer, steer, speed, lean, goalLean, lean_sim, leanrate \r\n")
 
 #timer class for switching figure 8 directions
 class Timer:
@@ -110,8 +120,6 @@ motor = robot.getDevice('drive_motor')
 steer = robot.getDevice('steering_motor')
 balance = robot.getDevice('balance_servo')
 
-motor.setPosition(float('inf'))
-
 imu = robot.getDevice('imu')
 imu.enable(timestep)
 gps = robot.getDevice('gps')
@@ -132,12 +140,12 @@ steerangle = 0
 
 
 #control gains for roll control  (PI)
-# kp = 2.42;
-# ki = 5.8;
-# kd = .22;
-kp = 3.2065
-ki = 6.996
-kd = 0.2195
+kp = 2.42;
+# kp = 1.98
+ki = 5.8;
+# ki = 4.32
+kd = .22;
+# kd = 0.18
 
 eRoll = 0;
 eRoll_old = 0;
@@ -149,6 +157,10 @@ goalRoll = 0
 # - perform simulation steps until Webots is stopping the controller
 while robot.step(timestep) != -1:
     simtime+=timestep/1000.0
+
+    if(firstLoop):
+        oldlean = balancesensor.getValue()
+        firstLoop = False
 
     # Read the sensors:
     #get current fwd speed
@@ -166,10 +178,10 @@ while robot.step(timestep) != -1:
     #read the actual steer angle from steering servo feedback
     steerangle = -steersensor.getValue()
     oldsteer = steerangle
+    # print("Old Lean: "+str(soldlean))
     lean = balancesensor.getValue()
     leanrate = (lean-oldlean)/(timestep/1000.0)
     oldlean = lean
-
 
     # set the motor to the correct velocity:
     # TODO: use closed-loop PI control and model the actual motor.
@@ -189,41 +201,59 @@ while robot.step(timestep) != -1:
         goalRoll = 0
         print("turn right: "+str(T1.elapsed))
     elif fsm.TURNLEFT:
-        goalRoll =stepMag
+        goalRoll = stepMag
         print("turn left: "+str(T1.elapsed))
 
-    #filter goal roll angle to prevent crashing!
-    goalRoll_filt+= (timestep/1000.0)/goalRoll_tau*(goalRoll-goalRoll_filt)
+    # goalRoll = 0
 
-    #step in balance goal lean
-    # if(simtime>2):
-    #     goal_lean = 0.5
+    if((simtime-lastControlTime)>dTcontrol):
 
-    goal_lean = -(Klqr_balance[0]*roll +Klqr_balance[1]*lean + Klqr_balance[2]*rollRate + Klqr_balance[3]*leanrate)
+        #filter goal roll angle to prevent crashing!
+        goalRoll_filt+= (timestep/1000.0)/goalRoll_tau*(goalRoll-goalRoll_filt)
 
-    #now compute true lean based on goal lean and servo dynamics
-    lean_sim+= timestep/1000.0*leandot_sim
-    leandot_sim+=  timestep/1000.0*(wn_bal*wn_bal*(goal_lean-lean_sim) - z_bal*wn_bal*leandot_sim)
+        #step in balance goal lean
+        # if(simtime>stepTime):
+        #     goal_lean = 0.5
+
+        # goal_lean = -(Klqr_balance[0]*roll +Klqr_balance[1]*lean + Klqr_balance[2]*rollRate + Klqr_balance[3]*leanrate)
+        goal_lean = Klqr_balance[0]*roll - Klqr_balance[1]*lean - Klqr_balance[2]*rollRate - Klqr_balance[3]*leanrate
+
+        #now compute true lean based on goal lean and servo dynamics
+        lean_sim+= timestep/1000.0*leandot_sim
+        leandot_sim+=  timestep/1000.0*(wn_bal*wn_bal*(goal_lean-lean_sim) - z_bal*wn_bal*leandot_sim)
 
 
-    #print(roll)
-    #set the PID gains on the steer servo
-    #TODO: compute these for the REAL servo given step response of steer by itself.
-    steer.setControlPID(100,10,0)
-    steer.setVelocity(10)#setw MAX velocity of MG90s servo
-    steer.setAvailableTorque(.215)#set MAX torque of MG90S
+        #print(roll)
+        #set the PID gains on the steer servo
+        #TODO: compute these for the REAL servo given step response of steer by itself.
+        steer.setControlPID(100,10,0)
+        steer.setVelocity(10)#setw MAX velocity of MG90s servo
+        steer.setAvailableTorque(.215)#set MAX torque of MG90S
 
-    eRoll = goalRoll_filt -roll
-    intE += (timestep/1000.0)*(eRoll)
+        # balance.setControlPID(100,0,0)
+        # balance.setVelocity(40)
+        # balance.setAvailableTorque(5)
 
-    #compute steer angle command based on control law
-    #note that steering has a servo, so its ACTUAL steer angle is different than this command.
-    delta = kp*eRoll+ki*intE-kd*rollRate
-    steer.setPosition(delta)
-    # balance.setPosition(lean_sim)
-    balance.setPosition(0)
+        eRoll = goalRoll_filt -roll
+        intE += (timestep/1000.0)*(eRoll)
 
-    # if(recordData and simtime>=stepTime):
-    if(recordData):
+        #compute steer angle command based on control law
+        #note that steering has a servo, so its ACTUAL steer angle is different than this command.
+        delta = kp*eRoll+ki*intE-kd*rollRate
+        steer.setPosition(delta)
+        # steer.setPosition(0)
+        # balance.setPosition(lean_sim)
+        balance.setPosition(0)
+
+        print("Goal Roll: "+str(goalRoll))
+        print("Roll: "+str(roll))
+        # print("Goal Lean: "+str(goal_lean))
+        # print("Lean_sim: "+str(lean_sim))
+        # print("Lean: "+str(lean))
+        # print("Lean Rate: "+str(leanrate))
+        print("##########################")
+        lastControlTime = simtime
+
+    if(recordData and simtime>=stepTime):
         #f.write("# time, goalRoll, roll, rollrate, goalSteer, steer, speed \r\n")
-        f.write(str(simtime)+","+str(goalRoll)+","+str(roll)+","+str(rollRate)+","+str(delta)+","+str(steerangle)+","+str(U)+","+str(lean)+","+str(goal_lean)+","+str(lean_sim)+"\r\n")
+        f.write(str(simtime- stepTime)+","+str(stepMag)+","+str(roll)+","+str(rollRate)+","+str(delta)+","+str(steerangle)+","+str(U)+","+str(lean)+","+str(goal_lean)+","+str(lean_sim)+","+str(leanrate)+"\r\n")
