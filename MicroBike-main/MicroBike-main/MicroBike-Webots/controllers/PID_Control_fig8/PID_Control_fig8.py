@@ -143,8 +143,6 @@ eRoll = 0;
 eRoll_old = 0;
 intE = 0;
 
-goalRoll = 0
-
 # Main loop:
 # - perform simulation steps until Webots is stopping the controller
 while robot.step(timestep) != -1:
@@ -189,7 +187,7 @@ while robot.step(timestep) != -1:
         goalRoll = 0
         print("turn right: "+str(T1.elapsed))
     elif fsm.TURNLEFT:
-        goalRoll =stepMag
+        goalRoll = stepMag
         print("turn left: "+str(T1.elapsed))
 
     #filter goal roll angle to prevent crashing!

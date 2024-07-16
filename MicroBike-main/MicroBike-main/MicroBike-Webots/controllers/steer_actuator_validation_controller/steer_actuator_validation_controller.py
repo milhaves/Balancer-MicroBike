@@ -116,8 +116,6 @@ while (robot.step(timestep) != -1) and simtime<(steer_stepTime*2):
     #update the command steer angle using the actuator model
     steer_actuator.update(steer_desired,timestep/1000.0)
 
-    motor.setVelocity(0)
-
     U = gps.getSpeed()
 
     # Read the sensors:
