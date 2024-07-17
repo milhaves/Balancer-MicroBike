@@ -17,17 +17,17 @@ def getModelMDK():
   lc1 = 0.04
   l2 = 0.05
   lc2 = l2
-  I1 = 0
-  I2 = 0
-  # I1 = (1/12)*m1*lc1*lc1
-  # I2 = (1/12)*m2*(l1+lc2)**2
+  # I1 = 0
+  # I2 = 0
+  I1 = (1/12)*m1*lc1*lc1
+  I2 = (1/12)*m2*(l1+lc2)**2
   Kp = m2*lc2*lc2*wn*wn
   Kd = 2*zeta*wn*m2*lc2*lc2
 
   #smallest eigenvalues at 1.75 m/s
-  s1 = -3.393
+  s1 = -2.2161
   # s1 = -5
-  s2 = -3.393
+  s2 = -2.2161
   # s2 = -10
 
   # J = ((1/3)*m1*lc1*lc1)+((1/3)*m2*((l1+lc2)**2))
