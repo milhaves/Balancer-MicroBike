@@ -9,8 +9,8 @@ from Rollover import Rollover
 from actuator_simulator import actuator_simulator
 
 # set up steering actuator
-steer_zeta = 1
-steer_wn = 23
+steer_zeta = 1.0
+steer_wn = 23.0
 steer_actuator = actuator_simulator(steer_zeta,steer_wn)
 
 # create the Robot instance
@@ -19,7 +19,7 @@ yawCorr = Rollover()
 
 # control params
 lastControlTime = 0
-dTcontrol = 0.005
+dTcontrol = 0.0005
 oldsteer = 0
 
 # sim values
@@ -60,9 +60,10 @@ steersensor.enable(timestep)
 balancesensor = robot.getDevice('pendulum_position')
 balancesensor.enable(timestep)
 
-kp = 3.2065
-ki = 6.996
-kd = 0.2195
+kp = 2.1
+ki = 3.15
+kd = 0.35
+Ksum = 1.0
 
 eRoll = 0
 intE = 0
@@ -104,13 +105,16 @@ while(robot.step(timestep) != -1) and simtime<(roll_stepTime*2):
     eRoll = roll_desired_filt - roll
     intE += (timestep/1000.0)*(eRoll)
 
-    delta = kp*eRoll+ki*intE-kd*rollRate
+    delta = Ksum*(kp*eRoll+ki*intE-kd*rollRate)
 
     # update the command steer angle using the acutator model
     steer_actuator.update(delta,timestep/1000.0)
 
     if((simtime-lastControlTime)>dTcontrol):
-        steer.setControlPID(100,0,0)
+        steer.setControlPID(1000,0,0)
+        steer.setVelocity(100)
+        steer.setAvailableTorque(100)
+
         steer.setPosition(steer_actuator.delta)
         print(steer_actuator.delta)
         balance.setPosition(0)
