@@ -112,7 +112,7 @@ while(robot.step(timestep) != -1) and simtime<(roll_stepTime*2):
 
     if((simtime-lastControlTime)>dTcontrol):
         steer.setControlPID(1000,0,0)
-        steer.setVelocity(100)
+        steer.setVelocity(1000)
         steer.setAvailableTorque(100)
 
         steer.setPosition(steer_actuator.delta)

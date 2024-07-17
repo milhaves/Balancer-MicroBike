@@ -167,6 +167,7 @@ InertialUnit {
           name "steering_motor"
           controlPID 100 0 0
           maxTorque 10000
+          maxVelocity 1000
         }
       ]
       endPoint DEF fork Solid {

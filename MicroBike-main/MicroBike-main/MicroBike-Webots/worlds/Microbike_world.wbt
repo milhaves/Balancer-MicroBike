@@ -143,5 +143,5 @@ DEF MOTORCYCLE Bicycle {
       ]
     }
   ]
-  controller "PID_Control_fig8"
+  controller "StepRollController"
 }
